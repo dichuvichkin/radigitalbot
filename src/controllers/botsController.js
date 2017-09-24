@@ -1,15 +1,22 @@
-import Bot, { vkTypes } from "../Bot";
+import Bot from "../VK";
+import { vkTypes } from "../Shared/types";
 
-import { onNewWallPostComment, onNewMessage } from "../VK/handlers";
+import {
+  onNewWallPostComment,
+  onNewMessage,
+  onNewPhotoComment,
+  onBoardPostNew
+} from "../VK/handlers";
 
 export const vkBot = ({ body }, res) => {
   const bot = Bot({
-    confirmString: "53cefcd8",
     body,
     res,
   });
   bot.handle(vkTypes.message)(onNewMessage);
   bot.handle(vkTypes.wallReplyNew)(onNewWallPostComment);
+  bot.handle(vkTypes.photoCommentNew)(onNewPhotoComment);
+  bot.handle(vkTypes.boardPostNew)(onBoardPostNew);
 };
 
 export const tgBot = (req, res) => {

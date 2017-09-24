@@ -1,9 +1,12 @@
-import { vkTypes } from "./types";
+import { vkTypes } from "../Shared/types";
+import groups from "./groups";
 
-const Bot = ({ confirmString, body, res }) => {
+const Bot = ({ body, res }) => {
   if (body.type === vkTypes.confirmation) {
-    res.send(confirmString);
+    const group = groups.find(el => el.group_id === body.group_id);
+    res.send(group.answer);
   }
+  // console.log(body.type)
   return {
     handle: type => callback => {
       if (type !== body.type) {

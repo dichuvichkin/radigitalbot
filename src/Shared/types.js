@@ -3,6 +3,8 @@ export const vkTypes = {
   confirmation: "confirmation",
   wallPost: "wall_post_new",
   wallReplyNew: "wall_reply_new",
+  photoCommentNew: "photo_comment_new",
+  boardPostNew: "board_post_new"
 };
 
 export const tgTypes = {
