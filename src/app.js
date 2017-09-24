@@ -10,16 +10,16 @@ const app = express();
 app.use(compression());
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  }),
+);
 
 app.use(expressValidator());
 
 app.use(cookieParser());
 
-app.use('/', routes);
-
-
+app.use("/", routes);
 
 export default app;

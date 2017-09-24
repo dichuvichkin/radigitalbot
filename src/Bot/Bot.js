@@ -1,12 +1,6 @@
-import {
-  vkTypes
-} from "./types";
+import { vkTypes } from "./types";
 
-const Bot = ({
-  confirmString,
-  body,
-  res
-}) => {
+const Bot = ({ confirmString, body, res }) => {
   if (body.type === vkTypes.confirmation) {
     res.send(confirmString);
   }
@@ -16,11 +10,11 @@ const Bot = ({
         return;
       }
       callback({
-          group_id: body.group_id,
-          ...body.object
+        group_id: body.group_id,
+        ...body.object,
       });
       res.sendStatus(200);
-    }
+    },
   };
 };
 

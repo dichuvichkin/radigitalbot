@@ -1,6 +1,2 @@
-export {
-  default
-}
-from "./Bot";
+export { default } from "./Bot";
 export { vkTypes, tgTypes } from "./types";
-export { postData } from "./helpers";

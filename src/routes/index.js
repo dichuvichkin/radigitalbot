@@ -1,11 +1,6 @@
-import {
-  Router
-} from "express";
+import { Router } from "express";
 
-import {
-  vkBot,
-  tgBot
-} from "../controllers/botsController";
+import { vkBot, tgBot } from "../controllers/botsController";
 
 const router = Router();
 
