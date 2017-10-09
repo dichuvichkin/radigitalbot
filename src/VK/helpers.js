@@ -4,10 +4,8 @@ import { tgTypes } from "../Shared/types";
 import { postData } from "../Shared/helpers";
 import methods from "./methods";
 
-const tgToken = "381181871:AAHNhEyIUfK3MIrA9eS9aJmbQ0YaRUTTONs";
-
 export const sendMessage = text =>
-  postData(tgToken, "121754413")(tgTypes.sendMessage)({
+  postData(process.env.TG_TOKEN, "121754413")(tgTypes.sendMessage)({
     parse_mode: tgTypes.HTML,
     text,
   });

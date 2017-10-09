@@ -6,7 +6,7 @@ const Bot = ({ body, res }) => {
     const group = groups.find(el => el.group_id === body.group_id);
     res.send(group.answer);
   }
-  // console.log(body.type)
+  res.sendStatus(200);
   return {
     handle: type => callback => {
       if (type !== body.type) {
@@ -16,7 +16,6 @@ const Bot = ({ body, res }) => {
         group_id: body.group_id,
         ...body.object,
       });
-      res.sendStatus(200);
     },
   };
 };

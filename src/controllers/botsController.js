@@ -1,15 +1,18 @@
-import Bot from "../VK";
-import { vkTypes } from "../Shared/types";
+import VkBot from "../VK";
+import TgBot from "../Telegram";
+import { vkTypes, tgCommands } from "../Shared/types";
 
 import {
   onNewWallPostComment,
   onNewMessage,
   onNewPhotoComment,
-  onBoardPostNew
+  onBoardPostNew,
 } from "../VK/handlers";
 
+import { whoAmI, addUser } from "../Telegram/handlers";
+
 export const vkBot = ({ body }, res) => {
-  const bot = Bot({
+  const bot = VkBot({
     body,
     res,
   });
@@ -19,6 +22,8 @@ export const vkBot = ({ body }, res) => {
   bot.handle(vkTypes.boardPostNew)(onBoardPostNew);
 };
 
-export const tgBot = (req, res) => {
-  res.sendStatus(200);
+export const tgBot = ({ body }, res) => {
+  const bot = TgBot({ body }, res);
+  bot.handle(tgCommands.start)(addUser);
+  bot.handle(tgCommands.whoAmI)(whoAmI);
 };

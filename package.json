@@ -28,12 +28,20 @@
   "eslintConfig": {
     "root": true,
     "extends": [
-        "airbnb-base",
-        "prettier"
+      "airbnb-base",
+      "prettier"
     ],
-    "rules" : {
-        "camelcase": [0, { "properties": "never" }],
-        "semi": [2, "always"]
+    "rules": {
+      "camelcase": [
+        0,
+        {
+          "properties": "never"
+        }
+      ],
+      "semi": [
+        2,
+        "always"
+      ]
     },
     "env": {
       "node": true
@@ -48,10 +56,14 @@
     "body-parser": "^1.18.1",
     "compression": "^1.7.0",
     "cookie-parser": "^1.4.3",
+    "dotenv": "^4.0.0",
     "express": "^4.15.4",
     "express-validator": "^4.1.1",
     "path": "^0.12.7",
-    "rimraf": "^2.6.1"
+    "pg": "^7.3.0",
+    "pg-hstore": "^2.3.2",
+    "rimraf": "^2.6.1",
+    "sequelize": "^4.13.5"
   },
   "babel": {
     "plugins": [

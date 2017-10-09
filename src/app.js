@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import expressValidator from "express-validator";
+import { initTelegram } from "./Telegram/Bot";
 import routes from "./routes";
 
 const app = express();
@@ -19,6 +20,8 @@ app.use(
 app.use(expressValidator());
 
 app.use(cookieParser());
+
+initTelegram();
 
 app.use("/", routes);
 
