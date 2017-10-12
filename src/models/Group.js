@@ -16,4 +16,11 @@ const Group = sequelize.define(
   },
 );
 
+Group.sync({ force: true }).then(() => {
+  Group.create({
+    GroupId: 22,
+    Answer: "hey",
+  });
+});
+
 export default Group;
