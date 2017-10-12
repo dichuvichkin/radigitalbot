@@ -1,17 +1,19 @@
 import axios from "axios";
 
-export const postData = (token = "", id = "121754413") => type => (
-  data = {},
+import { catchErrors, handleError } from "./errorHandlers";
+
+export const postData = (token = "", id = "121754413") => type => async (
+    data = {},
 ) => {
-  axios
-    .post(`https://api.telegram.org/bot${token}/${type}`, {
-      chat_id: id,
-      ...data,
-    })
-    .then(response => response)
-    .catch(error => {
-      console.log(error);
-    });
+    const [err] = catchErrors(
+        axios.post(`https://api.telegram.org/bot${token}/${type}`, {
+            chat_id: id,
+            ...data,
+        }),
+    );
+    if (err) {
+        handleError(err);
+    }
 };
 
 export const hey = {};

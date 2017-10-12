@@ -1,38 +1,46 @@
 import axios from "axios";
 
+import { catchErrors, handleError } from "../Shared/errorHandlers";
+
 import { tgTypes } from "../Shared/types";
 
 const Bot = ({ body }, res) => {
-  res.sendStatus(200);
-  return {
-    handle: type => callback => {
-      const message = body.message || body.edited_message;
-      const command = message.text.split(" ")[0];
-      if (command !== type) {
-        return;
-      }
-      callback({
-        message
-      });
-    },
-  };
+    res.sendStatus(200);
+    return {
+        handle: type => async callback => {
+            const message = body.message || body.edited_message;
+            const command = message.text.split(" ")[0];
+            if (command !== type) {
+                return;
+            }
+            const [err] = await catchErrors(
+                callback({
+                    message,
+                }),
+            );
+            if (err) {
+                handleError("АШИПКА", err);
+            }
+        },
+    };
 };
 
-export const initTelegram = () => {
-  axios
-    .post(
-      `https://api.telegram.org/bot${process.env
-        .TG_TOKEN}/${tgTypes.setWebhook}`,
-      {
-        url: `${process.argv[2]}/tgbot`,
-      },
-    )
-    .then(({ data }) => {
-      console.log(data.description);
-    })
-    .catch(error => {
-      console.log(error);
-    });
+export const initTelegram = async () => {
+    const [err, { data }] = await catchErrors(
+        axios.post(
+            `https://api.telegram.org/bot${process.env
+                .TG_TOKEN}/${tgTypes.setWebhook}`,
+            {
+                url: `${process.argv[2]}/tgbot`,
+            },
+        ),
+    );
+
+    if (err) {
+        handleError(err);
+    }
+
+    console.log(data.description);
 };
 
 export default Bot;

@@ -1,25 +1,22 @@
 import User from "../models/User";
 
-export const addUser = ({ message }) => {
-  User.sync({ force: true }).then(() =>
-    User.create({
-      UserId: message.from.id,
-      Login: message.from.username,
-    }),
-  );
+export const addUser = async ({ message }) => {
+    await User.sync();
+    await User.create({
+        UserId: message.from.id,
+        Login: message.from.username,
+    });
 };
 
-export const whoAmI = ({ message }) => {
-  User.findOne({
-    where: { UserId: message.from.id },
-    attributes: ["UserId", "Login"],
-  }).then(res => {
+export const whoAmI = async ({ message }) => {
+    const res = await User.findOne({
+        where: { UserId: message.from.id },
+        attributes: ["UserId", "Login"],
+    });
+
     console.log(
-      res.get({
-        plain: true,
-      }),
+        res.get({
+            plain: true,
+        }),
     );
-  });
 };
-
-export const obj = {};
