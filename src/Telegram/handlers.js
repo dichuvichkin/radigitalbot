@@ -2,9 +2,18 @@ import User from "../models/User";
 
 export const addUser = async ({ message }) => {
     await User.sync();
-    await User.create({
-        UserId: message.from.id,
-        Login: message.from.username,
+    await User.findOrCreate({
+        where: { UserId: message.from.id },
+        defaults: { Login: message.from.username },
+    }).spread((user, created) => {
+        const { Login } = user.get({
+            plain: true,
+        });
+        if (created) {
+            console.log(`Добро пожаловать, ${Login}`);
+        } else {
+            console.log(`И снова зравствуйте, ${Login}`);
+        }
     });
 };
 

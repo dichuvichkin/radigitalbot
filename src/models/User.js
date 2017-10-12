@@ -6,6 +6,7 @@ const User = sequelize.define(
   {
     UserId: {
       type: Sequelize.FLOAT,
+      unique: true
     },
     Login: {
       type: Sequelize.STRING,
