@@ -1,14 +1,5 @@
 import axios from "axios";
-
-import { tgTypes } from "../Shared/types";
-import { postData } from "../Shared/helpers";
 import methods from "./methods";
-
-export const sendMessage = text =>
-  postData(process.env.TG_TOKEN, "121754413")(tgTypes.sendMessage)({
-    parse_mode: tgTypes.HTML,
-    text,
-  });
 
 export const getData = ({ v = "5.8", vkMethod, ...rest }) =>
   axios

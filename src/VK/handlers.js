@@ -1,4 +1,5 @@
-import { getData, sendMessage, getUserAndGroup } from "./helpers";
+import { getData, getUserAndGroup } from "./helpers";
+import { sendMessage } from "../Shared/helpers";
 import methods from "./methods";
 
 export async function onNewWallPostComment({

@@ -9,7 +9,13 @@ import {
   onBoardPostNew,
 } from "../VK/handlers";
 
-import { whoAmI, addUser } from "../Telegram/handlers";
+import {
+  whoAmI,
+  addUser,
+  showGroups,
+  addGroup,
+  deleteAll,
+} from "../Telegram/handlers";
 
 export const vkBot = ({ body }, res) => {
   const bot = VkBot({
@@ -26,4 +32,7 @@ export const tgBot = ({ body }, res) => {
   const bot = TgBot({ body }, res);
   bot.handle(tgCommands.start)(addUser);
   bot.handle(tgCommands.whoAmI)(whoAmI);
+  bot.handle(tgCommands.showGroups)(showGroups);
+  bot.handle(tgCommands.addGroup)(addGroup);
+  bot.handle(tgCommands.deleteAll)(deleteAll);
 };

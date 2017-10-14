@@ -6,6 +6,6 @@ const router = Router();
 
 router.post("/vkbot", vkBot);
 
-router.post("/tgbot", tgBot);
+router.post(`/${process.env.TG_TOKEN}`, tgBot);
 
 export default router;

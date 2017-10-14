@@ -8,7 +8,7 @@ const Bot = ({ body }, res) => {
     res.sendStatus(200);
     return {
         handle: type => async callback => {
-            const message = body.message || body.edited_message;
+            const message = (body.message || body.edited_message);
             const command = message.text.split(" ")[0];
             if (command !== type) {
                 return;
@@ -31,7 +31,7 @@ export const initTelegram = async () => {
             `https://api.telegram.org/bot${process.env
                 .TG_TOKEN}/${tgTypes.setWebhook}`,
             {
-                url: `${process.argv[2]}/tgbot`,
+                url: `${process.argv[2]}/${process.env.TG_TOKEN}`,
             },
         ),
     );
