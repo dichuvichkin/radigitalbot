@@ -1,6 +1,7 @@
 import VkBot from "../VK";
 import TgBot from "../Telegram";
 import { vkTypes, tgCommands } from "../Shared/types";
+import { catchErrors, handleError } from "../Shared/errorHandlers";
 
 import {
   onNewWallPostComment,
@@ -17,11 +18,17 @@ import {
   deleteAll,
 } from "../Telegram/handlers";
 
-export const vkBot = ({ body }, res) => {
-  const bot = VkBot({
-    body,
-    res,
-  });
+export const vkBot = async ({ body }, res) => {
+  const [err, bot] = await catchErrors(
+    VkBot({
+      body,
+      res,
+    }),
+  );
+  if (err) {
+    handleError("Произошла одна или несколько ошибок. Лол", err);
+    return;
+  }
   bot.handle(vkTypes.message)(onNewMessage);
   bot.handle(vkTypes.wallReplyNew)(onNewWallPostComment);
   bot.handle(vkTypes.photoCommentNew)(onNewPhotoComment);

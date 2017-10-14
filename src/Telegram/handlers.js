@@ -1,5 +1,5 @@
-import User from "../models/User";
 import Group from "../models/Group";
+import User from "../models/User";
 
 import { sendMessage } from "../Shared/helpers";
 
@@ -35,13 +35,13 @@ export const addGroup = async ({ message }) => {
       .split(" ")
       .slice(1)
       .map(el => el.trim())
-      .filter(el => parseFloat(el))[0],
+      .filter(el => Number(el))[0],
     message.text
       .trim()
       .split(" ")
       .slice(1)
       .map(el => el.trim())
-      .filter(el => !parseFloat(el))[0],
+      .filter(el => !Number(el))[0],
   ];
   await Group.sync();
   const createRes = await Group.findOrCreate({
@@ -68,8 +68,8 @@ export const showGroups = async ({ message }) => {
     .map(el => ` Id группы: ${el.GroupId}, ответ: ${el.Answer}`);
   const text = `Ваши группы: ${groups}`;
   if (!groups.length) {
-      sendMessage("Пусто! Как у студента в холодосе", UserId);
-      return;
+    sendMessage("Пусто! Как у студента в холодосе", UserId);
+    return;
   }
   sendMessage(text, UserId);
 };
@@ -83,8 +83,8 @@ export const deleteAll = async ({ message }) => {
     },
   });
   if (!deletedQuontity) {
-      sendMessage(`Нечего удалять, бро`, UserId);
-      return;
+    sendMessage(`Нечего удалять, бро`, UserId);
+    return;
   }
 
   sendMessage("Все группы удалены", UserId);

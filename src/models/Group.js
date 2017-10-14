@@ -5,7 +5,7 @@ const Group = sequelize.define(
   "group",
   {
     userId: {
-        type: Sequelize.INTEGER,
+      type: Sequelize.INTEGER,
     },
     GroupId: {
       type: Sequelize.FLOAT,

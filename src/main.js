@@ -2,7 +2,6 @@ import "./env";
 import app from "./app";
 
 import "./models/Sequlize";
-import "./models/User";
 
 app.set("port", process.env.PORT || 7777);
 const server = app.listen(app.get("port"), () => {

@@ -1,21 +1,34 @@
 import { vkTypes } from "../Shared/types";
-import groups from "./groups";
+import { catchErrors, handleError } from "../Shared/errorHandlers";
+import Group from "../models/Group";
 
-const Bot = ({ body, res }) => {
+const Bot = async ({ body, res }) => {
   if (body.type === vkTypes.confirmation) {
-    const group = groups.find(el => el.group_id === body.group_id);
-    res.send(group.answer);
+    const group = await Group.find({
+      where: { GroupId: body.group_id },
+      attributes: ["Answer"],
+    });
+    const { Answer } = group.get({
+      plain: true,
+    });
+    res.send(Answer);
   }
-  res.sendStatus(200);
   return {
-    handle: type => callback => {
+    handle: type => async callback => {
       if (type !== body.type) {
         return;
       }
-      callback({
-        group_id: body.group_id,
-        ...body.object,
-      });
+      const [err] = await catchErrors(
+        callback({
+          group_id: body.group_id,
+          ...body.object,
+        }),
+      );
+
+      if (err) {
+        handleError("АШИПКА", err);
+      }
+      res.sendStatus(200);
     },
   };
 };
