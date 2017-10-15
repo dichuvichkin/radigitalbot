@@ -1,5 +1,6 @@
 import axios from "axios";
 import methods from "./methods";
+import Group from "../models/Group";
 
 export const getData = ({ v = "5.8", vkMethod, ...rest }) =>
   axios
@@ -40,6 +41,23 @@ export async function getUserAndGroup({
   return {
     ...user,
     ...group,
-    files
+    files,
   };
 }
+
+export const confirmBot = async (body, res) => {
+  const group = await Group.find({
+    where: { GroupId: body.group_id },
+    attributes: ["Answer"],
+  });
+  const { Answer } = group.get({
+    plain: true,
+  });
+  res.send(Answer);
+};
+
+export const checkPay = async () => {
+  // await Group.find({
+  //   where: {}
+  // })
+};

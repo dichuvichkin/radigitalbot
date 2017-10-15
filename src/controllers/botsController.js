@@ -16,6 +16,8 @@ import {
   showGroups,
   addGroup,
   deleteAll,
+  promo,
+  status,
 } from "../Telegram/handlers";
 
 export const vkBot = async ({ body }, res) => {
@@ -29,17 +31,19 @@ export const vkBot = async ({ body }, res) => {
     handleError("Произошла одна или несколько ошибок. Лол", err);
     return;
   }
-  bot.handle(vkTypes.message)(onNewMessage);
-  bot.handle(vkTypes.wallReplyNew)(onNewWallPostComment);
-  bot.handle(vkTypes.photoCommentNew)(onNewPhotoComment);
-  bot.handle(vkTypes.boardPostNew)(onBoardPostNew);
+  await bot.handle(vkTypes.message)(onNewMessage);
+  await bot.handle(vkTypes.wallReplyNew)(onNewWallPostComment);
+  await bot.handle(vkTypes.photoCommentNew)(onNewPhotoComment);
+  await bot.handle(vkTypes.boardPostNew)(onBoardPostNew);
 };
 
-export const tgBot = ({ body }, res) => {
+export const tgBot = async ({ body }, res) => {
   const bot = TgBot({ body }, res);
-  bot.handle(tgCommands.start)(addUser);
-  bot.handle(tgCommands.whoAmI)(whoAmI);
-  bot.handle(tgCommands.showGroups)(showGroups);
-  bot.handle(tgCommands.addGroup)(addGroup);
-  bot.handle(tgCommands.deleteAll)(deleteAll);
+  await bot.handle(tgCommands.whoAmI)(whoAmI);
+  await bot.handle(tgCommands.start)(addUser);
+  await bot.handle(tgCommands.showGroups)(showGroups);
+  await bot.handle(tgCommands.addGroup)(addGroup);
+  await bot.handle(tgCommands.deleteAll)(deleteAll);
+  await bot.handle(tgCommands.promo)(promo);
+  await bot.handle(tgCommands.status)(status);
 };

@@ -1,18 +1,12 @@
 import { vkTypes } from "../Shared/types";
 import { catchErrors, handleError } from "../Shared/errorHandlers";
-import Group from "../models/Group";
+import { confirmBot, checkPay } from "./helpers";
 
 const Bot = async ({ body, res }) => {
   if (body.type === vkTypes.confirmation) {
-    const group = await Group.find({
-      where: { GroupId: body.group_id },
-      attributes: ["Answer"],
-    });
-    const { Answer } = group.get({
-      plain: true,
-    });
-    res.send(Answer);
+    await confirmBot(body, res);
   }
+  await checkPay(body, res);
   return {
     handle: type => async callback => {
       if (type !== body.type) {

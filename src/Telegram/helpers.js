@@ -1,3 +1,4 @@
+import moment from "moment";
 import User from "../models/User";
 
 export const getUserId = async UserId => {
@@ -8,8 +9,21 @@ export const getUserId = async UserId => {
   const { id } = user.get({
     plain: true,
   });
-  console.log(id);
   return id;
 };
 
-export const hey = {};
+export const setExpireDate = (quontity, type = "minutes") =>
+  moment().add(quontity, type);
+
+export const isAccountPaid = async UserId => {
+  const userData = await User.find({
+    where: { UserId },
+    attributes: ["payExpiresDay"],
+  });
+
+  const { payExpiresDay } = userData.get({
+    plain: true,
+  });
+
+  return moment(payExpiresDay).diff(moment()) > 0;
+};

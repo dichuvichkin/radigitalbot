@@ -1,9 +1,11 @@
+import moment from "moment";
 import Group from "../models/Group";
 import User from "../models/User";
+import Promo from "../models/Promo";
 
-import { sendMessage } from "../Shared/helpers";
+import { sendMessage, formatDate } from "../Shared/helpers";
 
-import { getUserId } from "./helpers";
+import { getUserId, setExpireDate, isAccountPaid } from "./helpers";
 
 export const addUser = async ({ message }) => {
   await User.sync({ force: true });
@@ -11,12 +13,16 @@ export const addUser = async ({ message }) => {
     UserId: message.from.id,
     Login: message.from.username,
   });
-  console.log(res);
+  console.log(
+    res.get({
+      plain: true,
+    }),
+  );
 };
 
 export const whoAmI = async () => {
   const res = await User.findAll({
-    include: [Group],
+    include: [Group, Promo],
   });
 
   console.log(
@@ -52,11 +58,12 @@ export const addGroup = async ({ message }) => {
     defaults: { Answer },
   });
   if (createRes[1]) {
-    sendMessage("Группа успешно добавлена", UserId);
+    await sendMessage("Группа успешно добавлена", UserId);
   } else {
-    sendMessage("Такая группа уже существует", UserId);
+    await sendMessage("Такая группа уже существует", UserId);
   }
 };
+
 export const showGroups = async ({ message }) => {
   const UserId = message.from.id;
 
@@ -68,10 +75,10 @@ export const showGroups = async ({ message }) => {
     .map(el => ` Id группы: ${el.GroupId}, ответ: ${el.Answer}`);
   const text = `Ваши группы: ${groups}`;
   if (!groups.length) {
-    sendMessage("Пусто! Как у студента в холодосе", UserId);
+    await sendMessage("Пусто! Как у студента в холодосе", UserId);
     return;
   }
-  sendMessage(text, UserId);
+  await sendMessage(text, UserId);
 };
 
 export const deleteAll = async ({ message }) => {
@@ -83,9 +90,87 @@ export const deleteAll = async ({ message }) => {
     },
   });
   if (!deletedQuontity) {
-    sendMessage(`Нечего удалять, бро`, UserId);
+    await sendMessage(`Нечего удалять, бро`, UserId);
     return;
   }
 
-  sendMessage("Все группы удалены", UserId);
+  await sendMessage("Все группы удалены", UserId);
+};
+
+export const promo = async ({ message }) => {
+  const UserId = message.from.id;
+
+  const promoCode = message.text
+    .split(" ")
+    .slice(1)
+    .find(el => el === process.env.PROMO);
+
+  if (!promoCode) {
+    return;
+  }
+
+  await Promo.sync();
+  const promoRes = await Promo.findOrCreate({
+    where: { userId: await getUserId(UserId), code: promoCode },
+  });
+
+  if (promoRes[1]) {
+    const date = setExpireDate(20);
+    await User.update(
+      {
+        payExpiresDay: date,
+      },
+      {
+        where: {
+          UserId,
+        },
+      },
+    );
+    await sendMessage(`Ваш аккаунт активен до ${formatDate(date)}`, UserId);
+    return;
+  }
+
+  const rawUserTime = await User.find({
+    where: { UserId },
+    attributes: ["payExpiresDay"],
+  });
+
+  const { payExpiresDay } = rawUserTime.get({
+    plain: true,
+  });
+
+  const expiredDate = formatDate(payExpiresDay);
+
+  const isElapsed = moment(payExpiresDay).diff(moment()) < 0;
+  const text = isElapsed
+    ? "Срок его действия истек"
+    : `Срок действия истекает ${expiredDate}`;
+
+  await sendMessage(`Промокод уже активирован. ${text}`, UserId);
+};
+
+export const status = async ({ message }) => {
+  const UserId = message.from.id;
+
+  const hasPaid = await isAccountPaid(UserId);
+
+  if (!hasPaid) {
+    await sendMessage("Аккаунт не оплачен");
+    return;
+  }
+
+  const userData = await User.find({
+    where: { UserId },
+    attributes: ["payExpiresDay"],
+  });
+
+  const { payExpiresDay } = userData.get({
+    plain: true,
+  });
+
+  const expiredDate = formatDate(payExpiresDay);
+  await sendMessage(
+    `Срок оплаты вашего аккаунта завершается ${expiredDate}`,
+    UserId,
+  );
 };
