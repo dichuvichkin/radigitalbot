@@ -15,7 +15,7 @@ import {
   addUser,
   showGroups,
   addGroup,
-  deleteAll,
+  deleteGroup,
   promo,
   status,
 } from "../Telegram/handlers";
@@ -43,7 +43,7 @@ export const tgBot = async ({ body }, res) => {
   await bot.handle(tgCommands.start)(addUser);
   await bot.handle(tgCommands.showGroups)(showGroups);
   await bot.handle(tgCommands.addGroup)(addGroup);
-  await bot.handle(tgCommands.deleteAll)(deleteAll);
+  await bot.handle(tgCommands.deleteGroup)(deleteGroup);
   await bot.handle(tgCommands.promo)(promo);
   await bot.handle(tgCommands.status)(status);
 };

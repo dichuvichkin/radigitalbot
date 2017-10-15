@@ -1,7 +1,5 @@
 import moment from "moment";
-import Group from "../models/Group";
-import User from "../models/User";
-import Promo from "../models/Promo";
+import { Group, Promo, User } from "../models";
 
 import { sendMessage, formatDate } from "../Shared/helpers";
 
@@ -51,28 +49,45 @@ export const addGroup = async ({ message }) => {
   ];
   await Group.sync();
   const createRes = await Group.findOrCreate({
-    where: {
-      userId: await getUserId(UserId),
-      GroupId,
-    },
-    defaults: { Answer },
+    where: { GroupId },
+    attributes: ["id"],
+    defaults: { Answer, userId: await getUserId(UserId) },
   });
   if (createRes[1]) {
     await sendMessage("Группа успешно добавлена", UserId);
-  } else {
-    await sendMessage("Такая группа уже существует", UserId);
+    return;
   }
+
+  const user = await User.findOne({
+    where: { UserId },
+  });
+
+  const groupId = createRes[0].get("id");
+
+  const isLinkedToUser = await user.hasGroups(groupId);
+
+  if (isLinkedToUser) {
+    await sendMessage("Такая группа уже существует", UserId);
+    return;
+  }
+
+  await user.addGroups(groupId);
+  await sendMessage("Группа успешно добавлена", UserId);
 };
 
 export const showGroups = async ({ message }) => {
   const UserId = message.from.id;
 
-  const groups = await Group.findAll({
-    where: { userId: await getUserId(UserId) },
-    attributes: ["GroupId", "Answer"],
-  })
+  const user = await User.findOne({
+    where: { UserId },
+  });
+  const groups = await user
+    .getGroups({
+      attributes: ["GroupId", "Answer"],
+    })
     .map(group => group.get({ plain: true }))
     .map(el => ` Id группы: ${el.GroupId}, ответ: ${el.Answer}`);
+
   const text = `Ваши группы: ${groups}`;
   if (!groups.length) {
     await sendMessage("Пусто! Как у студента в холодосе", UserId);
@@ -81,20 +96,22 @@ export const showGroups = async ({ message }) => {
   await sendMessage(text, UserId);
 };
 
-export const deleteAll = async ({ message }) => {
+export const deleteGroup = async ({ message }) => {
   const UserId = message.from.id;
-
-  const deletedQuontity = await Group.destroy({
-    where: {
-      userId: await getUserId(UserId),
-    },
+  const GroupId = Number(message.text.split(" ").slice(1));
+  const group = await Group.findOne({
+    where: { GroupId },
   });
-  if (!deletedQuontity) {
-    await sendMessage(`Нечего удалять, бро`, UserId);
+  if (!group) {
+    await sendMessage("Такой группы не было", UserId);
     return;
   }
-
-  await sendMessage("Все группы удалены", UserId);
+  const groupId = group.get("id");
+  const user = await User.findOne({
+    where: { UserId },
+  });
+  await user.removeGroups(groupId);
+  await sendMessage("Группа удалена", UserId);
 };
 
 export const promo = async ({ message }) => {

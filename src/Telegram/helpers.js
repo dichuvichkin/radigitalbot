@@ -1,5 +1,5 @@
 import moment from "moment";
-import User from "../models/User";
+import { User } from "../models";
 
 export const getUserId = async UserId => {
   const user = await User.find({

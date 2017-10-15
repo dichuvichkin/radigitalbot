@@ -21,7 +21,7 @@ export const tgCommands = {
   help: "/help",
   showGroups: "/showGroups",
   addGroup: "/addGroup",
-  deleteAll: "/deleteAll",
+  deleteGroup: "/deleteGroup",
   promo: "/promo",
   status: "/status"
 };

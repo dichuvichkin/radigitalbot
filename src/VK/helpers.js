@@ -1,6 +1,6 @@
 import axios from "axios";
 import methods from "./methods";
-import Group from "../models/Group";
+import { Group } from "../models";
 
 export const getData = ({ v = "5.8", vkMethod, ...rest }) =>
   axios
