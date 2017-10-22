@@ -1,4 +1,6 @@
 import axios from "axios";
+import { Op } from "sequelize";
+import moment from "moment";
 import methods from "./methods";
 import { Group } from "../models";
 
@@ -56,8 +58,24 @@ export const confirmBot = async (body, res) => {
   res.send(Answer);
 };
 
-export const checkPay = async () => {
-  // await Group.find({
-  //   where: {}
-  // })
+export const checkPay = async body => {
+  const groups = await Group.find({
+    where: { GroupId: body.group_id },
+  });
+  const users = await groups
+    .getUsers({
+      where: {
+        payExpiresDay: {
+          [Op.gt]: moment().format(),
+        },
+      },
+      attributes: ["UserId"],
+    })
+    .map(group => group.get("UserId"));
+
+  if (!users.length) {
+    return null;
+  }
+
+  return users;
 };

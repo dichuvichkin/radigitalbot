@@ -31,6 +31,9 @@ export const vkBot = async ({ body }, res) => {
     handleError("Произошла одна или несколько ошибок. Лол", err);
     return;
   }
+  if (!bot) {
+    return;
+  }
   await bot.handle(vkTypes.message)(onNewMessage);
   await bot.handle(vkTypes.wallReplyNew)(onNewWallPostComment);
   await bot.handle(vkTypes.photoCommentNew)(onNewPhotoComment);

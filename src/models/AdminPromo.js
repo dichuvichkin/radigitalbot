@@ -1,12 +1,9 @@
 import Sequelize from "sequelize";
 import sequelize from "./Sequlize";
 
-const Promo = sequelize.define(
-  "promo",
+const AdminPromo = sequelize.define(
+  "admin_promo",
   {
-    userId: {
-      type: Sequelize.INTEGER,
-    },
     code: Sequelize.STRING,
   },
   {
@@ -14,4 +11,4 @@ const Promo = sequelize.define(
   },
 );
 
-export default Promo;
+export default AdminPromo;

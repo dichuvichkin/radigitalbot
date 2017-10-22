@@ -8,6 +8,7 @@ export async function onNewWallPostComment({
   post_owner_id,
   text,
   id,
+  users = [],
   attachments = [],
 }) {
   const { first_name, last_name, files, screen_name } = await getUserAndGroup({
@@ -23,7 +24,7 @@ export async function onNewWallPostComment({
 
   const message = `Пользователь <a href="https://vk.com/id${from_id}">${first_name} ${last_name}</a> оставил комментарий под <a href="https://vk.com/${screen_name}?w=wall${post_owner_id}_${id}">постом</a>: <i>${text}</i> ${files}`;
 
-  sendMessage(message);
+  await sendMessage(message, users);
 }
 
 export async function onNewMessage({ user_id, group_id, body }) {

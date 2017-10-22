@@ -14,16 +14,3 @@ export const getUserId = async UserId => {
 
 export const setExpireDate = (quontity, type = "minutes") =>
   moment().add(quontity, type);
-
-export const isAccountPaid = async UserId => {
-  const userData = await User.find({
-    where: { UserId },
-    attributes: ["payExpiresDay"],
-  });
-
-  const { payExpiresDay } = userData.get({
-    plain: true,
-  });
-
-  return moment(payExpiresDay).diff(moment()) > 0;
-};
