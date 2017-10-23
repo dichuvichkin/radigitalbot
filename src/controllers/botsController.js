@@ -42,8 +42,8 @@ export const vkBot = async ({ body }, res) => {
 
 export const tgBot = async ({ body }, res) => {
   const bot = TgBot({ body }, res);
-  await bot.handle(tgCommands.whoAmI)(whoAmI);
   await bot.handle(tgCommands.start)(addUser);
+  await bot.handle(tgCommands.whoAmI)(whoAmI);
   await bot.handle(tgCommands.showGroups)(showGroups);
   await bot.handle(tgCommands.addGroup)(addGroup);
   await bot.handle(tgCommands.deleteGroup)(deleteGroup);

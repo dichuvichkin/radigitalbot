@@ -31,7 +31,7 @@ export const initTelegram = async () => {
             `https://api.telegram.org/bot${process.env
                 .TG_TOKEN}/${tgTypes.setWebhook}`,
             {
-                url: `${process.argv[2]}/${process.env.TG_TOKEN}`,
+                url: `https://aa2f0613.ngrok.io/${process.env.TG_TOKEN}`,
             },
         ),
     );

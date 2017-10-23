@@ -3,7 +3,7 @@ import { Group, Promo, User, AdminPromo } from "../models";
 
 import { sendMessage, formatDate, isAccountPaid } from "../Shared/helpers";
 
-import { getUserId, setExpireDate } from "./helpers";
+import { setExpireDate } from "./helpers";
 
 export const addUser = async ({ message }) => {
   await User.sync({ force: true });
@@ -48,10 +48,10 @@ export const addGroup = async ({ message }) => {
       .filter(el => !Number(el))[0],
   ];
   await Group.sync();
-  const [group, isNew] = await Group.findOrCreate({
+  const [group, isCreated] = await Group.findOrCreate({
     where: { GroupId },
     attributes: ["id"],
-    defaults: { Answer, userId: await getUserId(UserId) },
+    defaults: { Answer },
   });
 
   const user = await User.findOne({
@@ -61,21 +61,22 @@ export const addGroup = async ({ message }) => {
   const groupId = group.get("id");
   const userId = user.get("id");
 
+  const hasUserHaveGroup = await user.hasGroup(groupId);
+
+  const isNew = isCreated || !hasUserHaveGroup;
+
   if (isNew) {
-    await group.addUser(userId);
+    await Promise.all([user.addGroups(groupId), group.addUser(userId)]);
     await sendMessage("Группа успешно добавлена", UserId);
     return;
   }
 
-  const isLinkedToUser = await user.hasGroups(groupId);
-
-  if (isLinkedToUser) {
+  if (hasUserHaveGroup) {
     await sendMessage("Такая группа уже существует", UserId);
     return;
   }
 
-  await user.addGroups(groupId);
-  await group.addUser(userId);
+  await Promise.all([user.addGroups(groupId), group.addUser(userId)]);
   await sendMessage("Группа успешно добавлена", UserId);
 };
 
@@ -120,14 +121,15 @@ export const deleteGroup = async ({ message }) => {
 
 export const promo = async ({ message }) => {
   const UserId = message.from.id;
-  await AdminPromo.sync();
+
   const promoCode = message.text
     .split(" ")
     .map(el => el.trim())
     .filter(el => el)
     .slice(1)[0];
 
-  const isPromoCode = await AdminPromo.find({
+  await AdminPromo.sync();
+  const isPromoCode = await AdminPromo.findOne({
     where: {
       code: promoCode,
     },
@@ -141,38 +143,43 @@ export const promo = async ({ message }) => {
     return;
   }
 
-  const userId = await getUserId(UserId);
+  const user = await User.findOne({
+    where: { UserId },
+  });
 
   await Promo.sync();
   const [promoModel, isCreated] = await Promo.findOrCreate({
-    where: { userId, code: promoCode },
+    where: { code: promoCode },
   });
 
-  if (isCreated) {
+  const userId = user.get("id");
+  const promoId = promoModel.get("id");
+
+  const hasUserHavePromo = await user.hasPromo(promoId);
+
+  const isNew = isCreated || !hasUserHavePromo;
+
+  if (isNew) {
     const date = setExpireDate(20);
-    await User.update(
-      {
-        payExpiresDay: date,
-      },
-      {
-        where: {
-          UserId,
+    await Promise.all([
+      User.update(
+        {
+          payExpiresDay: date,
         },
-      },
-    );
-    await promoModel.addUser(userId);
+        {
+          where: {
+            UserId,
+          },
+        },
+      ),
+      user.addPromo(promoId),
+      promoModel.addUser(userId),
+    ]);
     await sendMessage(`Ваш аккаунт активен до ${formatDate(date)}`, UserId);
     return;
   }
 
-  const rawUserTime = await User.find({
-    where: { UserId },
-    attributes: ["payExpiresDay"],
-  });
-
-  const { payExpiresDay } = rawUserTime.get({
-    plain: true,
-  });
+  const payExpiresDay = user.get("payExpiresDay");
 
   const expiredDate = formatDate(payExpiresDay);
 
@@ -194,14 +201,12 @@ export const status = async ({ message }) => {
     return;
   }
 
-  const userData = await User.find({
+  const userData = await User.findOne({
     where: { UserId },
     attributes: ["payExpiresDay"],
   });
 
-  const { payExpiresDay } = userData.get({
-    plain: true,
-  });
+  const { payExpiresDay } = userData.get("payExpiresDay");
 
   const expiredDate = formatDate(payExpiresDay);
   await sendMessage(

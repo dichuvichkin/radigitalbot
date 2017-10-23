@@ -4,6 +4,7 @@ import compression from "compression";
 import cookieParser from "cookie-parser";
 import expressValidator from "express-validator";
 import { initTelegram } from "./Telegram/Bot";
+// import sequelize, { Group, Promo } from "./models";
 import routes from "./routes";
 
 const app = express();
@@ -22,6 +23,12 @@ app.use(expressValidator());
 app.use(cookieParser());
 
 initTelegram();
+
+// sequelize.sync();
+
+// Group.sync({ force: true });
+
+// Promo.sync({ force: true });
 
 app.use("/", routes);
 

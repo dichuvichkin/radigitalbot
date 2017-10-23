@@ -6,10 +6,7 @@ export const getUserId = async UserId => {
     where: { UserId },
   });
 
-  const { id } = user.get({
-    plain: true,
-  });
-  return id;
+  return user.get("id");
 };
 
 export const setExpireDate = (quontity, type = "minutes") =>
