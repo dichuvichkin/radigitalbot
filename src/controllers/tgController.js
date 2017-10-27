@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { whoAmI, showGroups } from "../Telegram/handlers";
+import { addUser, whoAmI, showGroups, status } from "../Telegram/handlers";
 import { tgCommands } from "../Shared/types";
 
 const internalReq = axios.create({
@@ -9,12 +9,15 @@ const internalReq = axios.create({
 
 export const init = async ({ body }, res) => {
     const message = body.message || body.edited_message;
-    const command = message.text.split(" ")
+    const command = message.text
+        .split(" ")
         .map(el => el.trim())
         .filter(el => el)
         .find(str => str.startsWith("/"));
 
-    const isCommandExists = Object.values(tgCommands).includes(command);
+    const isCommandExists = Object.keys(tgCommands)
+        .map(key => tgCommands[key])
+        .includes(command);
 
     if (!command || !isCommandExists) {
         res.sendStatus(200);
@@ -26,12 +29,48 @@ export const init = async ({ body }, res) => {
     res.sendStatus(200);
 };
 
+export const addUserController = async ({ body }, res) => {
+    const { id, username } = body.message.from;
+    await addUser({
+        UserId: id,
+        Login: username
+    });
+    res.sendStatus(200);
+};
+
 export const whoAmIController = async (req, res) => {
     await whoAmI();
     res.sendStatus(200);
 };
 
 export const showGroupsController = async ({ body }, res) => {
-    await showGroups(body.message.from.id);
+    await showGroups({
+        UserId: body.message.from.id
+    });
+    res.sendStatus(200);
+};
+
+export const statusController = async ({ body }, res) => {
+    await status({ UserId: body.message.from.id });
+    res.sendStatus(200);
+};
+
+export const addGroupController = async ({ body }, res) => {
+    const [GroupId, Answer] = [
+        body.message.text
+            .trim()
+            .split(" ")
+            .slice(1)
+            .filter(el => el && Number(el))
+            .map(el => Number(el))[0],
+        body.message.text
+            .trim()
+            .split(" ")
+            .slice(1)
+            .filter(el => el && !Number(el))[0],
+    ];
+
+    console.log(typeof GroupId);
+    console.log(typeof Answer);
     res.sendStatus(200);
 };

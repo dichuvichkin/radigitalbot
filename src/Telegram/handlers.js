@@ -5,12 +5,19 @@ import { sendMessage, formatDate, isAccountPaid } from "../Shared/helpers";
 
 import { setExpireDate } from "./helpers";
 
-export const addUser = async ({ message }) => {
+export const addUser = async ({ UserId, Login }) => {
     await User.sync({ force: true });
-    const res = await User.create({
-        UserId: message.from.id,
-        Login: message.from.username,
+    await User.create({
+        UserId,
+        Login
     });
+};
+
+export const whoAmI = async () => {
+    const res = await User.findOne({
+        include: [Group, Promo],
+    });
+
     console.log(
         res.get({
             plain: true,
@@ -18,35 +25,7 @@ export const addUser = async ({ message }) => {
     );
 };
 
-export const whoAmI = async () => {
-    const res = await User.findAll({
-        include: [Group, Promo],
-    });
-
-    console.log(
-        res[0].get({
-            plain: true,
-        }),
-    );
-};
-
-export const addGroup = async ({ message }) => {
-    const UserId = message.from.id;
-
-    const [GroupId, Answer] = [
-        message.text
-            .trim()
-            .split(" ")
-            .slice(1)
-            .map(el => el.trim())
-            .filter(el => Number(el))[0],
-        message.text
-            .trim()
-            .split(" ")
-            .slice(1)
-            .map(el => el.trim())
-            .filter(el => !Number(el))[0],
-    ];
+export const addGroup = async ({ UserId, GroupId, Answer }) => {
     await Group.sync();
     const [group, isCreated] = await Group.findOrCreate({
         where: { GroupId },
@@ -80,7 +59,7 @@ export const addGroup = async ({ message }) => {
     await sendMessage("Группа успешно добавлена", UserId);
 };
 
-export const showGroups = async (UserId) => {
+export const showGroups = async ({ UserId }) => {
     const user = await User.findOne({
         where: { UserId },
     });
@@ -190,9 +169,7 @@ export const promo = async ({ message }) => {
     await sendMessage(`Промокод уже активирован. ${text}`, UserId);
 };
 
-export const status = async ({ message }) => {
-    const UserId = message.from.id;
-
+export const status = async ({ UserId }) => {
     const hasPaid = await isAccountPaid(UserId);
 
     if (!hasPaid) {
