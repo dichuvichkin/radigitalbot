@@ -45,7 +45,8 @@
       "semi": [
         2,
         "always"
-      ]
+      ],
+      "linebreak-style": 0
     },
     "env": {
       "node": true,
@@ -59,6 +60,7 @@
     "babel-core": "^6.23.1",
     "babel-preset-env": "^1.1.11",
     "body-parser": "^1.18.1",
+    "chalk": "^2.3.0",
     "compression": "^1.7.0",
     "cookie-parser": "^1.4.3",
     "dotenv": "^4.0.0",
