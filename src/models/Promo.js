@@ -4,9 +4,7 @@ import sequelize from "./Sequlize";
 const Promo = sequelize.define(
   "promo",
   {
-    userId: {
-      type: Sequelize.INTEGER,
-    },
+    userId: Sequelize.INTEGER,
     code: Sequelize.STRING,
   },
   {

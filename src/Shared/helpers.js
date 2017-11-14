@@ -25,15 +25,11 @@ export const formatDate = (date, format = "DD.MM.YYYY HH:mm") => {
     return momentDate.isValid() ? momentDate.format(format) : null;
 };
 
-export const isAccountPaid = async UserId => {
-    const userData = await User.find({
+export const hasAccountPaid = async UserId => {
+    const payExpiresDay = await User.find({
         where: { UserId },
         attributes: ["payExpiresDay"],
-    });
-
-    const { payExpiresDay } = userData.get({
-        plain: true,
-    });
+    }).get("payExpiresDay");
 
     return moment(payExpiresDay).diff(moment()) > 0;
 };

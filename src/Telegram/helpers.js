@@ -1,13 +1,17 @@
 import moment from "moment";
-import { User } from "../models";
+import axios from "axios";
 
-export const getUserId = async UserId => {
-  const user = await User.find({
-    where: { UserId },
-  });
+import { tgTypes } from "../Shared/types";
 
-  return user.get("id");
+export const initTelegram = async () => {
+    const { data } = await axios.post(
+        `https://api.telegram.org/bot${process.env.TG_TOKEN}/${tgTypes.setWebhook}`,
+        {
+            url: `${process.argv[2]}/${process.env.TG_TOKEN}`,
+        },
+    );
+
+    return data.description;
 };
-
-export const setExpireDate = (quontity, type = "minutes") =>
-  moment().add(quontity, type);
+export const setExpireDate = (quantity, type = "minutes") =>
+  moment().add(quantity, type);

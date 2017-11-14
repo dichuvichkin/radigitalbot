@@ -1,7 +1,7 @@
 import moment from "moment";
 import { Group, Promo, User, AdminPromo } from "../models";
 
-import { sendMessage, formatDate, isAccountPaid } from "../Shared/helpers";
+import { sendMessage, formatDate, hasAccountPaid } from "../Shared/helpers";
 
 import { setExpireDate } from "./helpers";
 
@@ -27,7 +27,7 @@ export const whoAmI = async () => {
 
 export const addGroup = async ({ UserId, GroupId, Answer }) => {
     await Group.sync();
-    const [group, isCreated] = await Group.findOrCreate({
+    const [group] = await Group.findOrCreate({
         where: { GroupId },
         attributes: ["id"],
         defaults: { Answer },
@@ -41,14 +41,6 @@ export const addGroup = async ({ UserId, GroupId, Answer }) => {
     const userId = user.get("id");
 
     const hasUserHaveGroup = await user.hasGroup(groupId);
-
-    const isNew = isCreated || !hasUserHaveGroup;
-
-    if (isNew) {
-        await Promise.all([user.addGroups(groupId), group.addUser(userId)]);
-        await sendMessage("Группа успешно добавлена", UserId);
-        return;
-    }
 
     if (hasUserHaveGroup) {
         await sendMessage("Такая группа уже существует", UserId);
@@ -79,9 +71,7 @@ export const showGroups = async ({ UserId }) => {
     await sendMessage(text, UserId);
 };
 
-export const deleteGroup = async ({ message }) => {
-    const UserId = message.from.id;
-    const GroupId = Number(message.text.split(" ").slice(1));
+export const deleteGroup = async ({ UserId, GroupId }) => {
     const group = await Group.findOne({
         where: { GroupId },
     });
@@ -97,19 +87,11 @@ export const deleteGroup = async ({ message }) => {
     await sendMessage("Группа удалена", UserId);
 };
 
-export const promo = async ({ message }) => {
-    const UserId = message.from.id;
-
-    const promoCode = message.text
-        .split(" ")
-        .map(el => el.trim())
-        .filter(el => el)
-        .slice(1)[0];
-
+export const promo = async ({ UserId, PromoCode }) => {
     await AdminPromo.sync();
     const isPromoCode = await AdminPromo.findOne({
         where: {
-            code: promoCode,
+            code: PromoCode,
         },
     });
 
@@ -127,7 +109,7 @@ export const promo = async ({ message }) => {
 
     await Promo.sync();
     const [promoModel, isCreated] = await Promo.findOrCreate({
-        where: { code: promoCode },
+        where: { code: PromoCode },
     });
 
     const userId = user.get("id");
@@ -170,21 +152,20 @@ export const promo = async ({ message }) => {
 };
 
 export const status = async ({ UserId }) => {
-    const hasPaid = await isAccountPaid(UserId);
+    const hasPaid = await hasAccountPaid(UserId);
 
     if (!hasPaid) {
         await sendMessage("Аккаунт не оплачен", UserId);
         return;
     }
 
-    const userData = await User.findOne({
+    const payExpiresDay = await User.findOne({
         where: { UserId },
         attributes: ["payExpiresDay"],
-    });
-
-    const { payExpiresDay } = userData.get("payExpiresDay");
+    }).get("payExpiresDay");
 
     const expiredDate = formatDate(payExpiresDay);
+    
     await sendMessage(
         `Срок оплаты вашего аккаунта завершается ${expiredDate}`,
         UserId,

@@ -7,7 +7,9 @@ import {
     whoAmIController,
     showGroupsController,
     statusController,
-    addGroupController
+    addGroupController,
+    deleteGroupController,
+    promoController
 } from "../controllers/tgController";
 import { tgCommands } from "../Shared/types";
 
@@ -24,5 +26,9 @@ router.post(tgCommands.showGroups, catchErrors(showGroupsController));
 router.post(tgCommands.status, catchErrors(statusController));
 
 router.post(tgCommands.addGroup, catchErrors(addGroupController));
+
+router.post(tgCommands.deleteGroup, catchErrors(deleteGroupController));
+
+router.post(tgCommands.promo, catchErrors(promoController));
 
 export default router;

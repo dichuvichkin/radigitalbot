@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import expressValidator from "express-validator";
-import { initTelegram } from "./Telegram/Bot";
+import { initTelegram } from "./Telegram/helpers";
 // import sequelize, { Group, Promo } from "./models";
 import { tgRoutes } from "./routes";
 import { developmentErrors } from "./Shared/errorHandlers";

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { addUser, whoAmI, showGroups, status } from "../Telegram/handlers";
+import { addUser, whoAmI, showGroups, status, addGroup, deleteGroup, promo } from "../Telegram/handlers";
 import { tgCommands } from "../Shared/types";
 
 const internalReq = axios.create({
@@ -70,7 +70,37 @@ export const addGroupController = async ({ body }, res) => {
             .filter(el => el && !Number(el))[0],
     ];
 
-    console.log(typeof GroupId);
-    console.log(typeof Answer);
+    await addGroup({
+        UserId: body.message.from.id,
+        GroupId,
+        Answer
+    });
     res.sendStatus(200);
 };
+
+export const deleteGroupController = async ({ body }, res) => {
+    const UserId = body.message.from.id;
+    const GroupId = Number(body.message.text.split(" ").slice(1));
+    await deleteGroup({
+        UserId,
+        GroupId
+    });
+    res.sendStatus(200);
+};
+
+export const promoController = async ({ body }, res) => {
+    const UserId = body.message.from.id;
+
+    const PromoCode = body.message.text
+        .split(" ")
+        .map(el => el.trim())
+        .filter(el => el)
+        .slice(1)[0];
+
+    await promo({
+        UserId,
+        PromoCode
+    });
+    res.sendStatus(200);
+};
+

@@ -2,22 +2,20 @@ import Sequelize from "sequelize";
 import sequelize from "./Sequlize";
 
 const Group = sequelize.define(
-  "group",
-  {
-    userId: {
-      type: Sequelize.INTEGER,
-      unique: true
+    "group",
+    {
+        userId: Sequelize.INTEGER,
+        GroupId: {
+            type: Sequelize.FLOAT,
+            unique: true
+        },
+        Answer: {
+            type: Sequelize.STRING,
+        },
     },
-    GroupId: {
-      type: Sequelize.FLOAT,
+    {
+        timestamps: false,
     },
-    Answer: {
-      type: Sequelize.STRING,
-    },
-  },
-  {
-    timestamps: false,
-  },
 );
 
 export default Group;
