@@ -5,18 +5,22 @@ import { User } from "../models";
 
 import { tgTypes } from "./types";
 
-export const postData = (token = "", id) => type => async (data = {}) => {
+export const postData = async ({ token = "", id, type, data = {} }) => {
     await axios.post(`https://api.telegram.org/bot${token}/${type}`, {
         chat_id: id,
-        ...data,
+        ...data
     });
 };
 
-export const sendMessage = async (text, ids = []) => {
-    const post = postData(process.env.TG_TOKEN, ids)(tgTypes.sendMessage);
-    await post({
-        parse_mode: tgTypes.HTML,
-        text,
+export const sendMessage = async (text, id) => {
+    await postData({
+        token: process.env.TG_TOKEN,
+        id,
+        type: tgTypes.message,
+        data: {
+            parse_mode: tgTypes.HTML,
+            text
+        }
     });
 };
 

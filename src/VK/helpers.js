@@ -52,10 +52,7 @@ export const confirmBot = async (body, res) => {
     where: { GroupId: body.group_id },
     attributes: ["Answer"],
   });
-  const { Answer } = group.get({
-    plain: true,
-  });
-  res.send(Answer);
+  res.send(group.get("Answer"));
 };
 
 export const checkPay = async body => {
