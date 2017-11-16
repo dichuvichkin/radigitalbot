@@ -1,7 +1,7 @@
 import moment from "moment";
 import { Group, Promo, User, AdminPromo } from "../models";
 
-import { sendMessage, formatDate, hasAccountPaid } from "../Shared/helpers";
+import { sendMessage, sendMessages, formatDate, hasAccountPaid } from "../Shared/helpers";
 
 import { setExpireDate } from "./helpers";
 
@@ -13,16 +13,15 @@ export const addUser = async ({ UserId, Login }) => {
     });
 };
 
-export const whoAmI = async () => {
+export const whoAmI = async ({ UserId }) => {
     const res = await User.findOne({
         include: [Group, Promo],
     });
 
-    console.log(
-        res.get({
-            plain: true,
-        }),
-    );
+    const message = res.get({
+        plain: true,
+    });
+    await sendMessages(message, [UserId]);
 };
 
 export const addGroup = async ({ UserId, GroupId, Answer }) => {
@@ -165,7 +164,7 @@ export const status = async ({ UserId }) => {
     }).get("payExpiresDay");
 
     const expiredDate = formatDate(payExpiresDay);
-    
+
     await sendMessage(
         `Срок оплаты вашего аккаунта завершается ${expiredDate}`,
         UserId,

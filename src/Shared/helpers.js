@@ -16,12 +16,17 @@ export const sendMessage = async (text, id) => {
     await postData({
         token: process.env.TG_TOKEN,
         id,
-        type: tgTypes.message,
+        type: tgTypes.sendMessage,
         data: {
             parse_mode: tgTypes.HTML,
             text
         }
     });
+};
+
+
+export const sendMessages = async (text, ids = []) => {
+    await Promise.all(ids.map(id => sendMessage(text, id)));
 };
 
 export const formatDate = (date, format = "DD.MM.YYYY HH:mm") => {

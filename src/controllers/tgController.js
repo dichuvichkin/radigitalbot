@@ -38,8 +38,9 @@ export const addUserController = async ({ body }, res) => {
     res.sendStatus(200);
 };
 
-export const whoAmIController = async (req, res) => {
-    await whoAmI();
+export const whoAmIController = async ({ body }, res) => {
+    const UserId = body.message.from.id;
+    await whoAmI({ UserId });
     res.sendStatus(200);
 };
 
