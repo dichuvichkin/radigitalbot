@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import expressValidator from "express-validator";
 import { initTelegram } from "./Telegram/helpers";
 // import sequelize, { Group, Promo } from "./models";
-import { tgRoutes } from "./routes";
+import { tgRoutes, vkRoutes } from "./routes";
 import { developmentErrors } from "./Shared/errorHandlers";
 
 const app = express();
@@ -34,6 +34,7 @@ initTelegram().then(res => {
 // Promo.sync({ force: true });
 
 app.use(`/${process.env.TG_TOKEN}`, tgRoutes);
+app.use("/vkRoute", vkRoutes);
 
 if (app.get("env") === "development") {
   /* Development Error Handler - Prints stack trace */

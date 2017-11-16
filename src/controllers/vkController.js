@@ -1,0 +1,36 @@
+import axios from "axios";
+
+import {} from "../VK/handlers";
+import { confirmBot } from "../VK/helpers";
+import { vkTypes } from "../Shared/types";
+
+const internalReq = axios.create({
+    baseURL: `http://localhost:${process.env.PORT}`
+});
+
+export const init = async ({ body }, res) => {
+    const vkTypesKeys = Object.keys(vkTypes);
+    const index = vkTypesKeys
+        .map(key => vkTypes[key])
+        .findIndex(i => i === body.type);
+    if (!index) {
+        res.sendStatus(200);
+        return;
+    }
+
+    await internalReq.post(`/vkRoute/${vkTypesKeys[index]}`, {
+        ...body
+    });
+
+    res.sendStatus(200);
+};
+
+export const confirmationController = async ({ body }, res, next) => {
+    if (body.type === vkTypes.confirmation) {
+        const answer = await confirmBot({
+            GroupId: body.group_id
+        });
+        res.send(answer);
+    }
+    next({ body });
+};

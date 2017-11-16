@@ -1,10 +1,10 @@
 import { vkTypes } from "../Shared/types";
 import { catchErrors, handleError } from "../Shared/errorHandlers";
-import { confirmBot, checkPay } from "./helpers";
+import { /* confirmBot, */ checkPay } from "./helpers";
 
 const Bot = async ({ body, res }) => {
   if (body.type === vkTypes.confirmation) {
-    await confirmBot(body, res);
+    // await confirmBot(body, res);
   }
   const users = await checkPay(body);
   if (!users) {
