@@ -64,6 +64,7 @@
     "compression": "^1.7.0",
     "cookie-parser": "^1.4.3",
     "dotenv": "^4.0.0",
+    "errorhandler": "^1.5.0",
     "express": "^4.15.4",
     "express-validator": "^4.1.1",
     "moment": "^2.19.1",

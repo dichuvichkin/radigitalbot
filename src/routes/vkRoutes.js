@@ -1,14 +1,15 @@
 import { Router } from "express";
 import { catchErrors } from "../Shared/errorHandlers";
 
-import {/*  init, */ confirmationController } from "../controllers/vkController";
+import { mainController, confirmationController, wallReplyNewController } from "../controllers/vkController";
 
 const router = Router();
 
 router.post("/",
-    catchErrors(confirmationController)
+    catchErrors(confirmationController),
+    catchErrors(mainController)
 );
 
-router.post("/confirmation", catchErrors(confirmationController));
+router.post("/wallReplyNew", catchErrors(wallReplyNewController));
 
 export default router;

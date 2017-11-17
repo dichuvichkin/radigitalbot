@@ -3,10 +3,11 @@ import bodyParser from "body-parser";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import expressValidator from "express-validator";
+import errorHandler from "errorhandler";
 import { initTelegram } from "./Telegram/helpers";
 // import sequelize, { Group, Promo } from "./models";
 import { tgRoutes, vkRoutes } from "./routes";
-import { developmentErrors } from "./Shared/errorHandlers";
+// import { developmentErrors } from "./Shared/errorHandlers";
 
 const app = express();
 
@@ -38,7 +39,7 @@ app.use("/vkRoute", vkRoutes);
 
 if (app.get("env") === "development") {
   /* Development Error Handler - Prints stack trace */
-  app.use(developmentErrors);
+  app.use(errorHandler());
 }
 
 export default app;

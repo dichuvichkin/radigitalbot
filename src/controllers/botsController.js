@@ -3,7 +3,7 @@ import { vkTypes } from "../Shared/types";
 import { catchErrors, handleError } from "../Shared/errorHandlers";
 
 import {
-  onNewWallPostComment,
+  onWallReplyNew,
   onNewMessage,
   onNewPhotoComment,
   onBoardPostNew,
@@ -24,7 +24,7 @@ export default async ({ body }, res) => {
     return;
   }
   await bot.handle(vkTypes.message)(onNewMessage);
-  await bot.handle(vkTypes.wallReplyNew)(onNewWallPostComment);
+  await bot.handle(vkTypes.wallReplyNew)(onWallReplyNew);
   await bot.handle(vkTypes.photoCommentNew)(onNewPhotoComment);
   await bot.handle(vkTypes.boardPostNew)(onBoardPostNew);
 };

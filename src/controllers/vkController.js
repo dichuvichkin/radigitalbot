@@ -1,14 +1,14 @@
 import axios from "axios";
 
-import {} from "../VK/handlers";
-import { confirmBot } from "../VK/helpers";
+import { onWallReplyNew } from "../VK/handlers";
+import { confirmBot, getPayedUsers } from "../VK/helpers";
 import { vkTypes } from "../Shared/types";
 
 const internalReq = axios.create({
     baseURL: `http://localhost:${process.env.PORT}`
 });
 
-export const init = async ({ body }, res) => {
+export const mainController = async ({ body }, res) => {
     const vkTypesKeys = Object.keys(vkTypes);
     const index = vkTypesKeys
         .map(key => vkTypes[key])
@@ -31,6 +31,23 @@ export const confirmationController = async ({ body }, res, next) => {
             GroupId: body.group_id
         });
         res.send(answer);
+        return;
     }
-    next({ body });
+    next();
+};
+
+export const wallReplyNewController = async ({ body }, res) => {
+    const users = await getPayedUsers({ GroupId: body.group_id });
+    if (users) {
+        await onWallReplyNew({
+            GroupId: body.group_id,
+            FromId: body.object.from_id,
+            PostOwnerId: body.object.post_owner_id,
+            id: body.object.id,
+            text: body.object.text,
+            users,
+            attachments: body.object.attachments
+        });
+    }
+    res.sendStatus(200);
 };

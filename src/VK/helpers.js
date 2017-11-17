@@ -15,11 +15,11 @@ export const getData = ({ v = "5.8", vkMethod, ...rest }) =>
         .then(({ data }) => data)
         .catch(({ response }) => console.error(response));
 
-export async function getUserAndGroup({
+export const getUserAndGroup = async ({
                                           userData,
                                           groupData,
                                           attachments = [],
-                                      }) {
+                                      }) => {
     const [users, groups] = await Promise.all([
         getData({
             vkMethod: methods.usersGet,
@@ -45,7 +45,7 @@ export async function getUserAndGroup({
         ...group,
         files,
     };
-}
+};
 
 export const confirmBot = async ({ GroupId }) => {
     const answer = await Group.findOne({
@@ -55,9 +55,9 @@ export const confirmBot = async ({ GroupId }) => {
     return answer;
 };
 
-export const checkPay = async body => {
+export const getPayedUsers = async ({ GroupId }) => {
     const groups = await Group.find({
-        where: { GroupId: body.group_id },
+        where: { GroupId },
     });
     const users = await groups
         .getUsers({
