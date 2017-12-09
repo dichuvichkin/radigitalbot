@@ -1,3 +1,5 @@
+// @flow
+
 export const vkTypes = {
   messageNew: "message_new",
   confirmation: "confirmation",

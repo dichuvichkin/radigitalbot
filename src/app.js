@@ -24,10 +24,7 @@ app.use(expressValidator());
 
 app.use(cookieParser());
 
-initTelegram().then(res => {
-    console.log(res);
-});
-
+console.log(initTelegram());
 // sequelize.sync();
 
 // Group.sync({ force: true });
