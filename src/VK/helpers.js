@@ -1,10 +1,12 @@
 import axios from "axios";
-import { Op } from "sequelize";
+import Sequelize from "sequelize";
 import moment from "moment";
 import methods from "./methods";
 import { Group } from "../models";
 
-export const getData = ({ v = "5.8", vkMethod, ...rest }) =>
+const { Op } = Sequelize;
+
+export const getData = ({ v = "5.8", vkMethod, ...rest }: { v: string, vkMethod: string, rest: Object }) =>
     axios
         .get(`https://api.vk.com/method/${vkMethod}`, {
             params: {
@@ -19,7 +21,11 @@ export const getUserAndGroup = async ({
                                           userData,
                                           groupData,
                                           attachments = [],
-                                      }) => {
+                                      }: {
+    userData: Object,
+    groupData: Object,
+    attachments: Array<any>
+}) => {
     const [users, groups] = await Promise.all([
         getData({
             vkMethod: methods.usersGet,
@@ -47,7 +53,7 @@ export const getUserAndGroup = async ({
     };
 };
 
-export const confirmBot = async ({ GroupId }) => {
+export const confirmBot = async ({ GroupId }: { GroupId: number }) => {
     const answer = await Group.findOne({
         where: { GroupId },
         attributes: ["Answer"],
@@ -55,18 +61,19 @@ export const confirmBot = async ({ GroupId }) => {
     return answer;
 };
 
-export const getPayedUsers = async ({ GroupId }) => {
+export const getPayedUsers = async ({ GroupId }: { GroupId: number }) => {
     const groups = await Group.find({
         where: { GroupId },
     });
+    const currentDate = moment().format();
     const users = await groups
         .getUsers({
             where: {
                 payExpiresDay: {
-                    [Op.gt]: moment().format(),
+                    [Op.gt]: currentDate,
                 },
             },
-            attributes: ["UserId"],
+            attributes: ["UserId"]
         })
         .map(group => group.get("UserId"));
 

@@ -13,22 +13,19 @@ export const postData = ({
   type,
   data = {},
 }: {
-  token: any,
+  token: string,
   id: number,
   type: string,
   data: Object,
-}): Promise<void> =>
-  axios.post(
-    `https://api.telegram.org/bot${token}/${type}`,
-    ({
-      chat_id: id,
-      ...data,
-    }),
-  );
+}) =>
+  axios.post(`https://api.telegram.org/bot${token}/${type}`, {
+    chat_id: id,
+    ...data,
+  });
 
-export const sendMessage = (text: string, id: number): Promise<void> =>
+export const sendMessage = (text: string, id: number) =>
   postData({
-    token: process.env.TG_TOKEN,
+    token: process.env.TG_TOKEN || "",
     id,
     type: tgTypes.sendMessage,
     data: {
@@ -37,21 +34,19 @@ export const sendMessage = (text: string, id: number): Promise<void> =>
     },
   });
 
-export const sendMessages = (
-  text: string,
-  ids: Array<number> = [],
-): Promise<void[]> => Promise.all(ids.map(id => sendMessage(text, id)));
+export const sendMessages = (text: string, ids: Array<number> = []) =>
+  Promise.all(ids.map(id => sendMessage(text, id)));
 
 export const formatDate = (
-  date: moment | string,
+  date: moment,
   format: string = "DD.MM.YYYY HH:mm",
-): string => {
-  const momentDate: moment = moment(date);
+) => {
+  const momentDate = moment(date);
   return momentDate.isValid() ? momentDate.format(format) : "";
 };
 
-export const hasAccountPaid = async (UserId: number): Promise<boolean> => {
-  const payExpiresDay: Promise<string> = await User.find({
+export const hasAccountPaid = async (UserId: number) => {
+  const payExpiresDay = await User.find({
     where: { UserId },
     attributes: ["payExpiresDay"],
   }).get("payExpiresDay");

@@ -20,7 +20,7 @@ type Body = {
   PromoCode?: string
 }
 
-export const addUser = async ({ UserId, Login }: Body): Promise<void> => {
+export const addUser = async ({ UserId, Login }: Body) => {
   await User.sync({ force: true });
   await User.create({
     UserId,
@@ -28,7 +28,7 @@ export const addUser = async ({ UserId, Login }: Body): Promise<void> => {
   });
 };
 
-export const whoAmI = async ({ UserId }: Body): Promise<void> => {
+export const whoAmI = async ({ UserId }: Body) => {
   const res = await User.findOne({
     include: [Group, Promo]
   });
@@ -39,7 +39,7 @@ export const whoAmI = async ({ UserId }: Body): Promise<void> => {
   await sendMessages(message, [UserId]);
 };
 
-export const addGroup = async ({ UserId, GroupId, Answer }: Body): Promise<void> => {
+export const addGroup = async ({ UserId, GroupId, Answer }: Body) => {
   await Group.sync();
   const [group] = await Group.findOrCreate({
     where: { GroupId },
@@ -65,7 +65,7 @@ export const addGroup = async ({ UserId, GroupId, Answer }: Body): Promise<void>
   await sendMessage("Группа успешно добавлена", UserId);
 };
 
-export const showGroups = async ({ UserId }: Body): Promise<void> => {
+export const showGroups = async ({ UserId }: Body) => {
   const user = await User.findOne({
     where: { UserId }
   });
@@ -76,7 +76,7 @@ export const showGroups = async ({ UserId }: Body): Promise<void> => {
     .map(group => group.get({ plain: true }))
     .map(el => ` Id группы: ${el.GroupId}, ответ: ${el.Answer}`);
 
-  const text: string = `Ваши группы: ${groups}`;
+  const text = `Ваши группы: ${groups}`;
 
   if (!groups.length) {
     await sendMessage("Пусто! Как у студента в холодосе", UserId);
@@ -85,7 +85,7 @@ export const showGroups = async ({ UserId }: Body): Promise<void> => {
   await sendMessage(text, UserId);
 };
 
-export const deleteGroup = async ({ UserId, GroupId }: Body): Promise<void> => {
+export const deleteGroup = async ({ UserId, GroupId }: Body) => {
   const group = await Group.findOne({
     where: { GroupId }
   });
@@ -101,7 +101,7 @@ export const deleteGroup = async ({ UserId, GroupId }: Body): Promise<void> => {
   await sendMessage("Группа удалена", UserId);
 };
 
-export const promo = async ({ UserId, PromoCode }: Body): Promise<void> => {
+export const promo = async ({ UserId, PromoCode }: Body) => {
   await AdminPromo.sync();
   const isPromoCode = await AdminPromo.findOne({
     where: {
@@ -134,11 +134,11 @@ export const promo = async ({ UserId, PromoCode }: Body): Promise<void> => {
   const isNew = isCreated || !hasUserHavePromo;
 
   if (isNew) {
-    const date: moment = setExpireDate(20);
+    const date = setExpireDate(20);
     await Promise.all([
       User.update(
         {
-          payExpiresDay: date.toString()
+          payExpiresDay: date
         },
         {
           where: {
@@ -152,11 +152,11 @@ export const promo = async ({ UserId, PromoCode }: Body): Promise<void> => {
     await sendMessage(`Ваш аккаунт активен до ${formatDate(date)}`, UserId);
   }
 
-  const payExpiresDay: string = user.get("payExpiresDay");
+  const payExpiresDay = user.get("payExpiresDay");
 
-  const expiredDate: string = formatDate(payExpiresDay);
+  const expiredDate = formatDate(payExpiresDay);
 
-  const isElapsed: boolean = moment(payExpiresDay).diff(moment()) < 0;
+  const isElapsed = moment(payExpiresDay).diff(moment()) < 0;
   const text = isElapsed
     ? "Срок его действия истек"
     : `Срок действия истекает ${expiredDate}`;
@@ -164,15 +164,15 @@ export const promo = async ({ UserId, PromoCode }: Body): Promise<void> => {
   await sendMessage(`Промокод уже активирован. ${text}`, UserId);
 };
 
-export const status = async ({ UserId }: Body): Promise<void> => {
-  const hasPaid: boolean = await hasAccountPaid(UserId);
+export const status = async ({ UserId }: Body) => {
+  const hasPaid = await hasAccountPaid(UserId);
 
   if (!hasPaid) {
     await sendMessage("Аккаунт не оплачен", UserId);
     return;
   }
 
-  const payExpiresDay: string = await User.findOne({
+  const payExpiresDay = await User.findOne({
     where: { UserId },
     attributes: ["payExpiresDay"]
   }).get("payExpiresDay");

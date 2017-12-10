@@ -13,20 +13,9 @@ import {
 } from "../Telegram/handlers";
 import { tgCommands } from "../Shared/types";
 
-type Init = {
-    body: {
-        message?: {
-            text: string
-        },
-        edited_message?: {
-            text: string
-        }
-    }
-}
-
 type VkBody = {
     body: {
-        message: {
+      ["message" | "edited_message"]: {
             text: string,
             from: {
                 id: number,
@@ -40,8 +29,8 @@ const internalReq = axios.create({
   baseURL: `http://localhost:${process.env.PORT || ""}`,
 });
 
-export const init = async ({ body }: Init, res: Object) => {
-  const { text } = body.message || body.edited_message || {};
+export const init = async ({ body }: VkBody, res: Object) => {
+  const { text } = body.message || body.edited_message;
   const command: string | typeof undefined = text
     .split(" ")
     .map(el => el.trim())
